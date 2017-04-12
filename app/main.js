@@ -1,6 +1,6 @@
 let firebase = require('firebase/app');
 require('firebase/auth');
-// require('firebase/database');
+require('firebase/database');
 let firebaseui = require('firebaseui');
 
 firebase.initializeApp({
@@ -12,13 +12,18 @@ firebase.initializeApp({
   messagingSenderId: '88343316553'
 });
 
+let fbDB = firebase.database();
+let fbAuth = firebase.auth();
+
 (() => {
+  let currentUser;
   let loginContainerElement = document.getElementById('firebaseui-auth-container');
   let registrationFormElement = document.getElementById('registration-form');
+  let voornaamInputElement = document.getElementById('voornaam-input');
+  let achternaamInputElement = document.getElementById('achternaam-input');
   let signOutButtonElement = document.getElementById('sign-out-button');
 
   let errorHandler = (error) => console.error('something went wrong', error);
-
   let showLogin = () => {
     loginContainerElement.style.display = 'block';
     signOutButtonElement.style.display = 'none';
@@ -37,7 +42,8 @@ firebase.initializeApp({
 
   let handleSignOut = (evt) => {
     evt.preventDefault();
-    firebase.auth().signOut().then(() => {
+
+    fbAuth.signOut().then(() => {
       console.log('signed out');
     }, errorHandler);
   };
@@ -66,7 +72,8 @@ firebase.initializeApp({
     // registrationFormElement.addEventListener('submit', TODO);
 
     // this will get triggered after page is loaded as well
-    firebase.auth().onAuthStateChanged((user) => {
+    fbAuth.onAuthStateChanged((user) => {
+      currentUser = user;
       user ? showForm(user) : showLogin();
     });
   };
